@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp_audio.wav
+*.tmp
+
+# Videos (don't commit video files)
+videos/*.mp4
+videos/*.mov
+videos/*.mkv
+videos/*.webm
+
+# Data files (tracking)
+data/uploads.json
+data/schedule.json
+
+# OS files
+.DS_Store
+Thumbs.db
+

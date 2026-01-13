@@ -1,0 +1,31 @@
+{
+  "name": "youtube-uploader",
+  "version": "1.0.0",
+  "description": "A script to automatically upload videos to YouTube with generated titles and descriptions.",
+  "type": "module",
+  "main": "src/script.js",
+  "scripts": {
+    "start": "node src/script.js",
+    "get-token": "node src/getRefreshToken.js",
+    "scheduled": "node src/scheduled.js",
+    "catch-up": "node src/catchup.js",
+    "setup-cron": "bash setup-cron.sh",
+    "setup-startup": "bash setup-startup.sh"
+  },
+  "dependencies": {
+    "googleapis": "^126.0.0",
+    "dotenv": "^16.4.5",
+    "openai": "^4.28.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.0"
+  },
+  "keywords": [
+    "youtube",
+    "uploader",
+    "video",
+    "automation"
+  ],
+  "author": "Narayan Jat",
+  "license": "MIT"
+}
