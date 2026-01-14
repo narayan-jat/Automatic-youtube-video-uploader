@@ -28,6 +28,7 @@ StandardError=append:$SCRIPT_DIR/logs/startup-error.log
 
 [Install]
 WantedBy=default.target
+After=network-online.target
 EOF
 
 # Reload systemd

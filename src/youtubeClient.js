@@ -12,8 +12,8 @@ class YouTubeClient {
 
     async authenticate() {
         try {
-            const tokenInfo = await this.oauth2Client.getAccessToken();
-            this.accessToken = tokenInfo?.token;
+        const tokenInfo = await this.oauth2Client.getAccessToken();
+        this.accessToken = tokenInfo?.token;
             if (this.accessToken) {
                 try {
                     const channelResponse = await this.youtube.channels.list({
@@ -31,7 +31,7 @@ class YouTubeClient {
                     // Ignore channel info errors
                 }
             }
-            return this.accessToken;
+        return this.accessToken;
         } catch (err) {
             console.error(`[ERROR] YouTube authentication failed: ${err.message}`);
             throw err;
@@ -40,31 +40,31 @@ class YouTubeClient {
 
     async uploadVideo(videoPath, title, description, tags = [], isForKids = false, language = 'en') {
         try {
-            const res = await this.youtube.videos.insert({
-                part: ['snippet', 'status'],
-                requestBody: {
-                    snippet: {
-                        title,
-                        description,
-                        tags,
-                        categoryId: '22',
-                        defaultLanguage: language
-                    },
-                    status: {
-                        privacyStatus: 'public',
-                        madeForKids: isForKids
-                    }
+        const res = await this.youtube.videos.insert({
+            part: ['snippet', 'status'],
+            requestBody: {
+                snippet: {
+                    title,
+                    description,
+                    tags,
+                    categoryId: '22',
+                    defaultLanguage: language
                 },
-                media: {
-                    body: fs.createReadStream(videoPath)
+                status: {
+                    privacyStatus: 'public',
+                    madeForKids: isForKids
                 }
-            });
-
-            if (!res || !res.data) {
-                throw new Error('Upload failed: No response data');
+            },
+            media: {
+                body: fs.createReadStream(videoPath)
             }
-            
-            return res.data;
+        });
+
+        if (!res || !res.data) {
+                throw new Error('Upload failed: No response data');
+        }
+
+        return res.data;
         } catch (err) {
             console.error(`[ERROR] Video upload failed: ${err.message}`);
             if (err.response) {

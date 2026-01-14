@@ -19,9 +19,15 @@ if [ -z "$NODE_PATH" ]; then
     exit 1
 fi
 
-# Create cron job entries
-CRON_JOB_1="0 9 * * * cd $SCRIPT_DIR && $NODE_PATH src/scheduled.js >> $SCRIPT_DIR/logs/cron.log 2>&1"
-CRON_JOB_2="0 19 * * * cd $SCRIPT_DIR && $NODE_PATH src/scheduled.js >> $SCRIPT_DIR/logs/cron.log 2>&1"
+# Use wrapper script that sets up environment automatically
+WRAPPER_SCRIPT="$SCRIPT_DIR/run-scheduled.sh"
+
+# Make wrapper script executable
+chmod +x "$WRAPPER_SCRIPT"
+
+# Create cron job entries using wrapper script
+CRON_JOB_1="0 9 * * * $WRAPPER_SCRIPT >> $SCRIPT_DIR/logs/cron.log 2>&1"
+CRON_JOB_2="0 19 * * * $WRAPPER_SCRIPT >> $SCRIPT_DIR/logs/cron.log 2>&1"
 
 # Check if cron jobs already exist
 if crontab -l 2>/dev/null | grep -q "src/scheduled.js"; then

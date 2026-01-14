@@ -15,8 +15,8 @@ class Tracker {
     _load() {
         try {
             if (fs.existsSync(this.filePath)) {
-                const raw = fs.readFileSync(this.filePath, 'utf8');
-                this.data = JSON.parse(raw || '{}');
+            const raw = fs.readFileSync(this.filePath, 'utf8');
+            this.data = JSON.parse(raw || '{}');
             } else {
                 this.data = {};
                 this._save();
@@ -29,8 +29,8 @@ class Tracker {
 
     _save() {
         try {
-            fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
-            fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2));
+        fs.mkdirSync(path.dirname(this.filePath), { recursive: true });
+        fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2));
         } catch (err) {
             console.error(`[ERROR] Failed to save tracking file: ${err.message}`);
             throw err;

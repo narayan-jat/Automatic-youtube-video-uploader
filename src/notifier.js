@@ -31,10 +31,27 @@ class Notifier {
             return;
         }
 
+        // Check if we have DISPLAY (cron jobs don't have X11 access)
+        const display = process.env.DISPLAY;
+        if (!display) {
+            // No DISPLAY available (likely running from cron)
+            console.log(`[NOTIFICATION] ${title}: ${message}`);
+            return;
+        }
+
         try {
-            await execAsync(`notify-send --urgency=${urgency} "${title}" "${message}"`);
+            // Set environment variables for the command
+            const env = { 
+                ...process.env, 
+                DISPLAY: display,
+                // DBUS_SESSION_BUS_ADDRESS might be needed for some systems
+                DBUS_SESSION_BUS_ADDRESS: process.env.DBUS_SESSION_BUS_ADDRESS || ''
+            };
+            await execAsync(`notify-send --urgency=${urgency} "${title}" "${message}"`, { env });
         } catch (err) {
-            console.error(`[ERROR] Failed to send notification: ${err.message}`);
+            // If notification fails, just log it (don't throw error)
+            // This is expected in cron environments without X11
+            console.log(`[NOTIFICATION] ${title}: ${message}`);
         }
     }
 

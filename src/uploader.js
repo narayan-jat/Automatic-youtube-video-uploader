@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import OpenAIClient from './openaiClient.js';
 import GeminiClient from './geminiClient.js';
 import YouTubeClient from './youtubeClient.js';
+import FacebookClient from './facebookClient.js';
 import Tracker from './tracker.js';
 import Logger from './logger.js';
 import Notifier from './notifier.js';
@@ -63,6 +64,17 @@ export default async function run(isCatchUp = false) {
         const yt = new YouTubeClient(youtubeCreds);
         const tracker = new Tracker();
 
+        // Initialize Facebook client if credentials are available
+        let facebook = null;
+        const facebookAccessToken = process.env.FACEBOOK_ACCESS_TOKEN;
+        const facebookPageId = process.env.FACEBOOK_PAGE_ID;
+        const enableFacebook = process.env.ENABLE_FACEBOOK === 'true';
+        
+        if (enableFacebook && facebookAccessToken) {
+            facebook = new FacebookClient(facebookAccessToken, facebookPageId || null);
+            logger.info('Facebook client initialized');
+        }
+
         if (!fs.existsSync(VIDEOS_DIR)) {
             const error = `Videos directory does not exist: ${VIDEOS_DIR}`;
             logger.error(error);
@@ -117,6 +129,25 @@ export default async function run(isCatchUp = false) {
         const res = await yt.uploadVideo(videoPath, title, description, tags, isForKids, language);
         const videoId = res.id || res.data?.id;
 
+        logger.info(`YouTube upload successful. Video ID: ${videoId}`);
+
+        // // Upload to Facebook as Reel if enabled
+        // let facebookResult = null;
+        // if (facebook) {
+        //     try {
+        //         logger.info('Uploading to Facebook as Reel...');
+        //         facebookResult = await facebook.postReel(videoPath, {
+        //             caption: `${title}\n\n${description}`,
+        //             hashtags: tags,
+        //             publishToFeed: true
+        //         });
+        //         logger.info(`Facebook Reel uploaded successfully. Reel ID: ${facebookResult.reelId}`);
+        //     } catch (fbError) {
+        //         logger.error(`Facebook upload failed: ${fbError.message}`, fbError);
+        //         // Don't fail the whole process if Facebook upload fails
+        //     }
+        // }
+
         // Mark as uploaded and delete video file
         tracker.markUploaded(next);
         scheduler.updateLastUpload();
@@ -140,7 +171,10 @@ export default async function run(isCatchUp = false) {
             // Ignore cleanup errors
         }
 
-        const successMessage = `Video uploaded successfully! Video ID: ${videoId}`;
+        let successMessage = `Video uploaded to YouTube! Video ID: ${videoId}`;
+        // if (facebookResult) {
+        //     successMessage += ` | Facebook Reel ID: ${facebookResult.reelId}`;
+        // }
         logger.success(successMessage);
         await notifier.notifySuccess(successMessage, isCatchUp);
 
